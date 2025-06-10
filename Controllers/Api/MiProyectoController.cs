@@ -22,13 +22,14 @@ public class MiProyectoController : ControllerBase
     [HttpGet("presentacion")]
     public IActionResult Presentacion()
     {
-        MongoClient client = new MongoClient(CadenasConexion.MONGO_DB);
-        var db = client.GetDatabase("Escuela_Angelina_Rogelio");
-        var collection = db.GetCollection<Equipo>("Equipo");
+        var client = new MongoClient(CadenasConexion.MONGO_DB);
+        var database = client.GetDatabase("Escuela_Angelina_Rogelio");
+        var collection = database.GetCollection<Equipo>("Equipo");
 
-        var lista = collection.Find(FilterDefinition<Equipo>.Empty).ToList();
+        var filter = FilterDefinition<Equipo>.Empty;
+        var item = collection.Find(filter).FirstOrDefault();
 
-        return Ok(lista);
+        return Ok(item);
         
     }
 }
