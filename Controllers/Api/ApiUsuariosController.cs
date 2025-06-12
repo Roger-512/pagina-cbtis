@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 [ApiController]
 [Route("api/usuarios")]
-public class UsuariosController : ControllerBase
+public class ApiUsuariosController : ControllerBase
 {
     //Métodos para hacer las operaciones CRUD
     // C = Create
@@ -14,7 +14,7 @@ public class UsuariosController : ControllerBase
 
     private readonly IMongoCollection<Usuario> collection;
 
-    public UsuariosController()
+    public ApiUsuariosController()
     {
        var client = new MongoClient(CadenasConexion.MONGO_DB);
         var database = client.GetDatabase("Escuela_Angelina_Rogelio");
@@ -22,10 +22,17 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult ListarUsuarios()
+    public IActionResult ListarUsuarios(string? texto)
     {
         var filter = FilterDefinition<Usuario>.Empty;
+        if (!string.IsNullOrWhiteSpace(texto))
+        {
+            var filterNombre = Builders<Usuario>.Filter.Regex(u => u.Nombre, new BsonRegularExpression(texto, "i"));
+            var filterCorreo = Builders<Usuario>.Filter.Regex(u => u.Correo, new BsonRegularExpression(texto, "i"));
+            filter = Builders<Usuario>.Filter.Or(filterNombre, filterCorreo);
+        }
         var list = this.collection.Find(filter).ToList();
+
         return Ok(list); 
     }
 }
