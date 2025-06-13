@@ -16,7 +16,7 @@ public class ApiUsuariosController : ControllerBase
 
     public ApiUsuariosController()
     {
-       var client = new MongoClient(CadenasConexion.MONGO_DB);
+        var client = new MongoClient(CadenasConexion.MONGO_DB);
         var database = client.GetDatabase("Escuela_Angelina_Rogelio");
         this.collection = database.GetCollection<Usuario>("Usuarios");
     }
@@ -33,6 +33,18 @@ public class ApiUsuariosController : ControllerBase
         }
         var list = this.collection.Find(filter).ToList();
 
-        return Ok(list); 
+        return Ok(list);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(string id)
+    {
+        var filter = Builders<Usuario>.Filter.Eq(x => x.Id, id);
+        var item = this.collection.Find(filter).FirstOrDefault();
+        if (item != null)
+        {
+            this.collection.DeleteOne(filter);
+        }
+        return NoContent();
     }
 }
