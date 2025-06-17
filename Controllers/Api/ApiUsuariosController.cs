@@ -114,8 +114,8 @@ public class ApiUsuariosController : ControllerBase
 
         //Validar que el correo no exista
         var filtercorreo = Builders<Usuario>.Filter.Eq(x => x.Correo, model.Correo);
-        var itemexistente = this.collection.Find(filtercorreo).FirstOrDefault();
-        if (itemexistente != null)
+        var itemExistente = this.collection.Find(filtercorreo).FirstOrDefault();
+        if (itemExistente != null && itemExistente.Id != id)
         {
             return BadRequest("El correo " + model.Correo + " ya existe en la base de datos");
         }
@@ -127,14 +127,13 @@ public class ApiUsuariosController : ControllerBase
             return NotFound("No existe un usuario con el ID proporcionado");
         }
 
-        /*
-        Usuario bd = new Usuario();
-        bd.Nombre = model.Nombre;
-        bd.Correo = model.Correo;
-        bd.Password = model.Password;
+        var updateOptions = Builders<Usuario>.Update
+            .Set(x => x.Correo, model.Correo)
+            .Set(x => x.Nombre, model.Nombre)
+            .Set(x => x.Password, model.Password);
 
-        this.collection.InsertOne(bd);
-        */
+        this.collection.UpdateOne(filter, updateOptions);
+        
 
         
         return Ok();
